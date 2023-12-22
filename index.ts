@@ -36,6 +36,9 @@ export default class PaoForm {
                 if (errorMessageElement) {
                     errorMessageElement.innerHTML = this.getErrorMessages(control);
                 }
+
+                // @todo: expensive ??
+                this.displayFormStatus();
             }
         });
     }
@@ -119,18 +122,18 @@ export default class PaoForm {
         });
     }
 
-    updateErrorMessages() {
-      Object.values(this.formControls).forEach((control) => {
-        const errorMessageElement = document.getElementById(`${control.id}Error`);
-        if (errorMessageElement) {
-          errorMessageElement.innerHTML = this.getErrorMessages(control);
-        }
-      });
-    }
+    //updateErrorMessages() {
+    //  Object.values(this.formControls).forEach((control) => {
+    //    const errorMessageElement = document.getElementById(`${control.id}Error`);
+    //    if (errorMessageElement) {
+    //      errorMessageElement.innerHTML = this.getErrorMessages(control);
+    //    }
+    //  });
+    //}
 
     displayFormStatus() {
       // Update error messages for individual controls
-      this.updateErrorMessages();
+      this.renderFormControls();
 
       // Check the overall form status
       const formIsValid = this.getFormStatus();
