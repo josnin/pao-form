@@ -1,0 +1,37 @@
+{
+  "name": "pao-form",
+  "version": "0.2.13",
+  "description": "pao-form Form builder",
+  "keywords": [
+    "jong-router",
+    "web components router",
+    "custom elements"
+  ],
+  "main": "dist/pao-form.min.js",
+  "types": "dist/pao-form.d.ts",
+  "type": "module",
+  "engines": {
+    "node": ">=18.18.2"
+  },
+  "scripts": {
+    "dev": "node node_modules/vite/bin/vite.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josnin/pao-form.git"
+  },
+  "author": "josnin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/josnin/pao-form/issues"
+  },
+  "homepage": "https://github.com/josnin/pao-form#readme",
+  "devDependencies": {
+    "@types/node": "^18.11.14",
+    "esbuild": "^0.19.9",
+    "rimraf": "^4.1.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8"
+  }
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reactive Form Builder Example</title>
+  <style>
+    .error-message {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <form id="contactForm">
+      <div>
+        <h2>Personal Information</h2>
+
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName">
+        <div id="firstNameError" class="error-message"></div>
+
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName">
+        <div id="lastNameError" class="error-message"></div>
+
+        <h3>Contact Details</h3>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email">
+        <div id="emailError" class="error-message"></div>
+
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone">
+        <div id="phoneError" class="error-message"></div>
+      </div>
+
+      <div>
+        <h2>Address Information</h2>
+
+        <!-- Dynamic addresses will be added here -->
+        <div id="dynamicAddresses"></div>
+
+        <button type="button" onclick="addAddress()">Add Address</button>
+        <button type="button" onclick="removeAddress()">Remove Last Address</button>
+        <button type="button" onclick="displayFormStatus()">Display Form Status</button>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import ReactiveFormBuilder from './index'
+    const reactiveFormBuilder = new ReactiveFormBuilder('contactForm');
+
+    const Validators = {
+      required: {
+        validate: (value) => !!value.trim(),
+        message: 'This field is required.',
+      },
+      email: {
+        validate: (value) => /\S+@\S+\.\S+/.test(value),
+        message: 'Invalid email address.',
+      },
+    };
+
+    // Define form controls
+    reactiveFormBuilder
+      .control('firstName', [Validators.required])
+      .control('lastName', [Validators.required])
+      .control('email', [Validators.required, Validators.email])
+      .control('phone', [Validators.required]);
+
+    // Debug output
+    console.log(reactiveFormBuilder.build());
+
+    // Render the updated form controls
+    renderFormControls();
+
+    // Debug output after adding an address
+    console.log(reactiveFormBuilder.build());
+
+    function addAddress() {
+      // Add an address dynamically
+      reactiveFormBuilder.addArray('addressArray');
+
+      // Render the updated form controls
+      renderFormControls();
+
+      // Debug output after adding an address
+      console.log(reactiveFormBuilder.build());
+    }
+
+    function removeAddress() {
+      // Remove the last item from the addressArray dynamically
+      reactiveFormBuilder.removeFromArray('addressArray');
+
+      // Render the updated form controls
+      renderFormControls();
+
+      // Debug output after removing an address
+      console.log(reactiveFormBuilder.build());
+    }
+
+    function renderFormControls() {
+      const dynamicAddressesContainer = document.getElementById('dynamicAddresses');
+      dynamicAddressesContainer.innerHTML = ''; // Clear previous content
+
+      // Iterate over the dynamically added addresses and create input elements
+      Object.values(reactiveFormBuilder.formControls).forEach((control) => {
+        dynamicAddressesContainer.innerHTML += generateInputHTML(control);
+        const errorMessageId = `${control.id}Error`;
+        const errorMessageElement = document.getElementById(errorMessageId);
+        errorMessageElement.innerHTML = reactiveFormBuilder.getErrorMessages(control);
+      });
+    }
+
+    function generateInputHTML(control)  {
+      return `<label for="${control.id}">${control.name}</label>
+        <input type="text" id="${control.id}" name="${control.name}">
+        <div id="${control.id}Error" class="error-message"></div>`;
+    }
+
+    function displayFormStatus() {
+      Object.values(reactiveFormBuilder.formControls).forEach((control) => {
+        const errorMessageElement = document.getElementById(`${control.id}Error`);
+        if (errorMessageElement) {
+          errorMessageElement.innerHTML = reactiveFormBuilder.getErrorMessages(control);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
