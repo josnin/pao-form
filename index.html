@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reactive Form Builder Example</title>
+  <title>Pao Form Builder Example</title>
   <style>
     .error-message {
       color: red;
@@ -43,7 +43,7 @@
 
         <button type="button" onclick="addAddress()">Add Address</button>
         <button type="button" onclick="removeAddress()">Remove Last Address</button>
-        <button type="button" onclick="displayFormStatus()">Display Form Status</button>
+        <button id="frmStatus" type="button">Display Form Status</button>
       </div>
 
       <button type="submit">Submit</button>
@@ -51,8 +51,8 @@
   </div>
 
   <script type="module">
-    import ReactiveFormBuilder from './index'
-    const reactiveFormBuilder = new ReactiveFormBuilder('contactForm');
+    import PaoForm from './index'
+    const formBuilder = new PaoForm('contactForm');
 
     const Validators = {
       required: {
@@ -66,55 +66,46 @@
     };
 
     // Define form controls
-    reactiveFormBuilder
+    formBuilder
       .control('firstName', [Validators.required])
       .control('lastName', [Validators.required])
       .control('email', [Validators.required, Validators.email])
-      .control('phone', [Validators.required]);
+      .control('phone', [Validators.required])
+      .renderFormControls();
 
     // Debug output
-    console.log(reactiveFormBuilder.build());
+   // console.log(formBuilder.build());
+    console.log(formBuilder.displayFormStatus());
 
     // Render the updated form controls
-    renderFormControls();
+    //renderFormControls();
 
     // Debug output after adding an address
-    console.log(reactiveFormBuilder.build());
+    //console.log(formBuilder.build());
 
     function addAddress() {
       // Add an address dynamically
-      reactiveFormBuilder.addArray('addressArray');
+      formBuilder.addArray('addressArray');
 
       // Render the updated form controls
       renderFormControls();
 
       // Debug output after adding an address
-      console.log(reactiveFormBuilder.build());
+      console.log(formBuilder.build());
     }
 
     function removeAddress() {
       // Remove the last item from the addressArray dynamically
-      reactiveFormBuilder.removeFromArray('addressArray');
+      formBuilder.removeFromArray('addressArray');
 
       // Render the updated form controls
       renderFormControls();
 
       // Debug output after removing an address
-      console.log(reactiveFormBuilder.build());
+      console.log(formBuilder.build());
     }
 
-    function renderFormControls() {
-      const dynamicAddressesContainer = document.getElementById('dynamicAddresses');
-      dynamicAddressesContainer.innerHTML = ''; // Clear previous content
 
-      // Iterate over the dynamically added addresses and create input elements
-      Object.values(reactiveFormBuilder.formControls).forEach((control) => {
-        dynamicAddressesContainer.innerHTML += generateInputHTML(control);
-        const errorMessageId = `${control.id}Error`;
-        const errorMessageElement = document.getElementById(errorMessageId);
-        errorMessageElement.innerHTML = reactiveFormBuilder.getErrorMessages(control);
-      });
-    }
 
     function generateInputHTML(control)  {
       return `<label for="${control.id}">${control.name}</label>
@@ -122,14 +113,8 @@
         <div id="${control.id}Error" class="error-message"></div>`;
     }
 
-    function displayFormStatus() {
-      Object.values(reactiveFormBuilder.formControls).forEach((control) => {
-        const errorMessageElement = document.getElementById(`${control.id}Error`);
-        if (errorMessageElement) {
-          errorMessageElement.innerHTML = reactiveFormBuilder.getErrorMessages(control);
-        }
-      });
-    }
+
+    //document.getElementById('frmStatus').addEventListener('click', displayFormStatus);
   </script>
 </body>
 </html>
