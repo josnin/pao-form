@@ -28,14 +28,7 @@ export default class PaoForm {
             const control = this.formControls[controlName];
 
             if (control) {
-                control.value = inputElement.value;
-                control.touched = true;
-                control.valid = this.validateControl(control);
-
-                const errorMessageElement = document.getElementById(`${controlName}Error`);
-                if (errorMessageElement) {
-                    errorMessageElement.innerHTML = this.getErrorMessages(control);
-                }
+                this.updateErrorMessages(control, inputElement);
 
                 // @todo: expensive ??
                 this.displayFormStatus();
@@ -46,7 +39,7 @@ export default class PaoForm {
     control(name: string, validators: Validator[] = []): this {
         this.formControls[name] = {
             name,
-            id: name.replace(/\./g, '_'),
+            id: name.replace(/\./g, '_'), //@todo why need to have dot?
             value: '',
             validators,
             valid: true,
@@ -104,7 +97,11 @@ export default class PaoForm {
         // Iterate over the dynamically added addresses and create input elements
         Object.values(this.formControls).forEach((control) => {
           const inputElement = document.getElementById(control.id) as HTMLInputElement;
+          this.updateErrorMessages(control, inputElement)
+        });
+    }
 
+    updateErrorMessages(control: FormControl, inputElement: HTMLInputElement ) {
           // Update the control's value based on the input element's current value
           control.value = inputElement.value;
 
@@ -118,18 +115,7 @@ export default class PaoForm {
           if (errorMessageElement) {
             errorMessageElement.innerHTML = this.getErrorMessages(control);
           }
-
-        });
     }
-
-    //updateErrorMessages() {
-    //  Object.values(this.formControls).forEach((control) => {
-    //    const errorMessageElement = document.getElementById(`${control.id}Error`);
-    //    if (errorMessageElement) {
-    //      errorMessageElement.innerHTML = this.getErrorMessages(control);
-    //    }
-    //  });
-    //}
 
     displayFormStatus() {
       // Update error messages for individual controls
