@@ -23,7 +23,7 @@
     <input type="email" id="personalEmail" name="personalEmail">
     <div id="personalEmailError" class="error-message"></div>
 
-    <div id="addressSection">
+    <div id="address">
       <label for="city">City:</label>
       <input type="text" id="city" name="city">
       <div id="cityError" class="error-message"></div>
@@ -41,7 +41,7 @@
       <div id="countryError" class="error-message"></div>
     </div>
 
-    <div id="emailsSection">
+    <div id="emails">
       <label>Emails:</label>
       <div id="emailsArrayError" class="error-message"></div>
       <div id="emailsArray">
@@ -64,6 +64,10 @@
           validator: (value) => /\S+@\S+\.\S+/.test(value),
           errorMessage: 'Invalid email address.',
         },
+        validCountry: {
+          validator: (value) => value == 'us',
+          errorMessage: 'Invalid country!'
+        }
       };
 
       const form = new FormGroup();
@@ -74,7 +78,7 @@
       const addressGroup = new FormGroup();
       addressGroup.addControl('city', '', [Validators.required]);
       addressGroup.addControl('zipcode', '', [Validators.required]);
-      addressGroup.addControl('country', 'us', [Validators.required]);
+      addressGroup.addControl('country', 'us', [Validators.required, Validators.validCountry]);
 
       form.addGroup('address', addressGroup);
 
@@ -83,34 +87,36 @@
       form.addFormArray('emails', emailsArray);
 
       document.getElementById('addEmail').addEventListener('click', () => {
-        const emailFormGroup = new FormGroup();
-
-        emailFormGroup.addControl('email', '', [Validators.required, Validators.email]);
-        emailFormGroup.addControl('label', '', [Validators.required]);
-
-        emailsArray.push(emailFormGroup);
 
         const emailInput = document.createElement('input');
         emailInput.type = 'email';
-        emailInput.name = 'email';
+        emailInput.id = `email${emailsArray.controls.length}`;
+        emailInput.name = `email${emailsArray.controls.length}`;
         emailInput.placeholder = 'Enter email';
         document.getElementById('emailsArray').appendChild(emailInput);
 
-        const labelInput = document.createElement('input');
-        labelInput.type = 'text';
-        labelInput.name = 'label';
-        labelInput.placeholder = 'Enter label';
-        document.getElementById('emailsArray').appendChild(labelInput);
+        const emailInputError = document.createElement('div');
+        emailInputError.id = `email${emailsArray.controls.length}Error`;
+        emailInputError.className = 'error-message';
+        document.getElementById('emailsArray').appendChild(emailInputError);
 
-        const removeButton = document.createElement('button');
-        removeButton.type = 'button';
-        removeButton.textContent = 'Remove';
-        document.getElementById('emailsArray').appendChild(removeButton);
+        // of course document should b ready first
+        const emailFormGroup = new FormGroup();
 
-        // Reuse addGenericListener for both email and label inputs
-        form.addGenericListener('email');
-        form.addGenericListener('label');
+        emailFormGroup.addControl(`email${emailsArray.controls.length}`, '', [Validators.required, Validators.email]);
+
+        emailsArray.push(emailFormGroup);
+
+        // trigger validation
+        form.validateAll();
+        
+
       });
+
+
+      //form.setControlValue('personalName', 'John Doe'); // value setter
+      //form.validateControl('personalName') // will update value & error
+      //form.validateAll()
 
       function submitForm(event) {
         event.preventDefault();
