@@ -1,138 +1,200 @@
-
 interface Validator {
-    validate: (value: string) => boolean;
-    message: string;
+  validator: (value: string, rule?: any) => boolean;
+  errorMessage: string;
 }
 
-interface FormControl {
-    name: string;
-    id: string;
-    value: string;
-    validators: Validator[];
-    valid: boolean;
-    touched: boolean;
+interface FormControls {
+  [key: string]: FormControl | FormGroup | FormArray;
 }
 
-export default class PaoForm {
-    private formControls: { [key: string]: FormControl } = {};
-    private formElement: HTMLFormElement;
+export class FormControl {
+  value: string;
+  validators: Validator[];
+  valid: boolean;
+  dirty: boolean;
 
-    constructor(formId: string) {
-        this.formElement = document.getElementById(formId) as HTMLFormElement;
+  constructor(initialValue = '', validators: Validator[] = []) {
+    this.value = initialValue;
+    this.validators = validators;
+    this.valid = validators.every(({ rule, validator }) => validator(initialValue, rule));
+    this.dirty = false;
+  }
 
-        this.formElement.addEventListener('input', (event) => {
-            const inputElement = event.target as HTMLInputElement;
-            const controlName = inputElement.name;
+  validateAll(): void {
+    this.dirty = true;
+    this.valid = this.validators.every(({ rule, validator }) => validator(this.value, rule));
+  }
+}
 
-            // Attempt to access the form control
-            const control = this.formControls[controlName];
+export class FormArray {
+  controls: FormControl[];
 
-            if (control) {
-                this.updateErrorMessages(control, inputElement);
+  constructor() {
+    this.controls = [];
+  }
 
-                // @todo: expensive ??
-                this.displayFormStatus();
-            }
-        });
-    }
+  push(control: FormControl): void {
+    this.controls.push(control);
+  }
 
-    control(name: string, validators: Validator[] = []): this {
-        this.formControls[name] = {
-            name,
-            id: name.replace(/\./g, '_'), //@todo why need to have dot?
-            value: '',
-            validators,
-            valid: true,
-            touched: false,
-        };
-        return this; // Allow method chaining
-    }
+  remove(index: number): void {
+    this.controls.splice(index, 1);
+  }
 
-    addArray(arrayName: string, size = 1): this {
-        Array.from({ length: size }, (_, index) => {
-            const name = `${arrayName}[${index}]`;
-            this.formControls[name] = {
-            name,
-            id: name.replace(/\./g, '_'),
-            value: '',
-            validators: [],
-            valid: true,
-            touched: false,
-            };
-        });
-        return this; // Allow method chaining
-    }
+  get value(): string[] {
+    return this.controls.map(control => control.value);
+  }
 
-    removeFromArray(arrayName: string): this {
-        if (this.formControls[arrayName]) {
-            delete this.formControls[arrayName];
-        }
-        return this; // Allow method chaining
-    }
+  get valid(): boolean {
+    return this.controls.every(control => control.valid);
+  }
 
-    build(): { controls: { [key: string]: FormControl } } {
-        return {
-            controls: this.formControls,
-        };
-    }
+  validateAll(): void {
+    this.controls.forEach(control => control.validateAll());
+  }
+}
 
-    validateControl(control: FormControl): boolean {
-        return control.validators.every((validator) => validator.validate(control.value));
-    }
+export class FormGroup {
+  controls: FormControls;
+  eventListeners: Record<string, { eventName: string; listener: EventListenerOrEventListenerObject }>;
+  customErrorMessages: Record<string, string>;
 
-    getErrorMessages(control: FormControl): string {
-        const errorMessages = control.validators
-            .filter((validator) => !validator.validate(control.value))
-            .map((validator) => validator.message);
+  constructor() {
+    this.controls = {};
+    this.eventListeners = {};
+    this.customErrorMessages = {};
+  }
 
-        return errorMessages.join('<br>') || '';
-    }
+  addControl(name: string, initialValue = '', validators: Validator[] = []): void {
+    this.controls[name] = new FormControl(initialValue, validators);
+    this.addGenericListener(name);
+  }
 
-    getFormStatus(): boolean {
-        return Object.values(this.formControls).every((control) => control.valid);
-    }
+  addGroup(name: string, group: FormGroup): void {
+    this.controls[name] = group;
+  }
 
-    renderFormControls() {
+  addFormArray(name: string, formArray: FormArray): void {
+    this.controls[name] = formArray;
+  }
 
-        // Iterate over the dynamically added addresses and create input elements
-        Object.values(this.formControls).forEach((control) => {
-          const inputElement = document.getElementById(control.id) as HTMLInputElement;
-          this.updateErrorMessages(control, inputElement)
-        });
-    }
-
-    updateErrorMessages(control: FormControl, inputElement: HTMLInputElement ) {
-          // Update the control's value based on the input element's current value
-          control.value = inputElement.value;
-
-          // Update the control's 'touched' and 'valid' properties
-          control.touched = true;
-          control.valid = this.validateControl(control);
-
-          // Update the error messages
-          const errorMessageId = `${control.id}Error`;
-          const errorMessageElement = document.getElementById(errorMessageId);
-          if (errorMessageElement) {
-            errorMessageElement.innerHTML = this.getErrorMessages(control);
-          }
-    }
-
-    displayFormStatus() {
-      // Update error messages for individual controls
-      this.renderFormControls();
-
-      // Check the overall form status
-      const formIsValid = this.getFormStatus();
-
-      // Display or use the form status as needed
-      if (formIsValid) {
-        console.log('Form is valid!');
+  get value(): Record<string, string | string[] | Record<string, string>> {
+    const result: Record<string, string | string[] | Record<string, string>> = {};
+    for (const [name, control] of Object.entries(this.controls)) {
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        result[name] = control.value;
       } else {
-        console.log('Form has validation errors.');
+        result[name] = control.value;
       }
     }
+    return result;
+  }
 
+  get valid(): boolean {
+    return Object.values(this.controls).every(control => control.valid);
+  }
 
+  setControlValue(name: string, value: string): void {
+    if (this.controls[name]) {
+      if (this.controls[name] instanceof FormGroup || this.controls[name] instanceof FormArray) {
+        this.controls[name].setControlValue(name, value);
+      } else {
+        this.controls[name].value = value;
+        this.controls[name].dirty = true;
+      }
+    }
+  }
 
+  validateControl(name: string): void {
+    if (this.controls[name]) {
+      if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
+        this.controls[name].validateAll();
+      }
+    }
+  }
+
+  validateAll(): void {
+    for (const name in this.controls) {
+      if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
+        this.controls[name].validateAll();
+      } else {
+        this.controls[name].validateAll();
+      }
+    }
+  }
+
+  addGenericListener(name: string): void {
+    if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray) && !this.eventListeners[name]) {
+      const element = document.getElementById(name);
+      const errorElement = document.getElementById(`${name}Error`);
+
+      if (element && errorElement) {
+        const listener = (event: Event) => {
+          this.setControlValue(name, (event.target as HTMLInputElement).value);
+          this.validateControl(name);
+
+          const errorMessage = this.getErrorMessage(name);
+          if (errorMessage) {
+            this.showErrorMessage(name, errorMessage);
+          } else {
+            this.hideErrorMessage(name);
+          }
+        };
+
+        // Use 'change' event for select elements, 'input' for others
+        const eventName = element.tagName.toLowerCase() === 'select' ? 'change' : 'input';
+
+        element.addEventListener(eventName, listener);
+
+        
+        this.eventListeners[name] = { eventName, listener };
+
+        // Trigger validation on initial load
+        this.validateControl(name);
+      }
+    }
+  }
+
+  removeGenericListener(name: string): void {
+    if (this.eventListeners[name]) {
+      const { eventName, listener } = this.eventListeners[name];
+      const element = document.getElementById(name);
+
+      if (element) {
+        element.removeEventListener(eventName, listener);
+        delete this.eventListeners[name];
+      }
+    }
+  }
+
+  showErrorMessage(name: string, errorMessage: string): void {
+    const errorElement = document.getElementById(`${name}Error`);
+    if (errorElement) {
+      errorElement.innerHTML = `<div>${errorMessage}</div>`;
+    }
+  }
+
+  hideErrorMessage(name: string): void {
+    const errorElement = document.getElementById(`${name}Error`);
+    if (errorElement) {
+      errorElement.innerHTML = ''; // Clear all error messages
+    }
+  }
+
+  setCustomErrorMessage(name: string, errorMessage: string): void {
+    this.customErrorMessages[name] = errorMessage;
+  }
+
+  getErrorMessage(name: string): string {
+    const control = this.controls[name];
+    if (control && !control.valid) {
+      const validatorWithError = control.validators.find(({ rule, validator }) =>
+        !validator(control.value, rule)
+      );
+      const customErrorMessage = this.customErrorMessages[name];
+      return customErrorMessage || validatorWithError?.errorMessage || '';
+    }
+    return '';
+  }
 }
 

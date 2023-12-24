@@ -3,118 +3,133 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pao Form Builder Example</title>
+  <title>Pao Form</title>
   <style>
     .error-message {
       color: red;
+      font-size: 12px;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <form id="contactForm">
-      <div>
-        <h2>Personal Information</h2>
 
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" name="firstName">
-        <div id="firstNameError" class="error-message"></div>
+  <form id="myForm">
+    <label for="personalName">Personal Name:</label>
+    <input type="text" id="personalName" name="personalName">
+    <div id="personalNameError" class="error-message"></div>
 
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" name="lastName">
-        <div id="lastNameError" class="error-message"></div>
+    <label for="personalEmail">Personal Email:</label>
+    <input type="email" id="personalEmail" name="personalEmail">
+    <div id="personalEmailError" class="error-message"></div>
 
-        <h3>Contact Details</h3>
+    <div id="addressSection">
+      <label for="city">City:</label>
+      <input type="text" id="city" name="city">
+      <div id="cityError" class="error-message"></div>
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email">
-        <div id="emailError" class="error-message"></div>
+      <label for="zipcode">Zipcode:</label>
+      <input type="text" id="zipcode" name="zipcode">
+      <div id="zipcodeError" class="error-message"></div>
 
-        <label for="phone">Phone</label>
-        <input type="tel" id="phone" name="phone">
-        <div id="phoneError" class="error-message"></div>
+      <label for="country">Country:</label>
+      <select id="country" name="country">
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+        <option value="uk">United Kingdom</option>
+      </select>
+      <div id="countryError" class="error-message"></div>
+    </div>
+
+    <div id="emailsSection">
+      <label>Emails:</label>
+      <div id="emailsArrayError" class="error-message"></div>
+      <div id="emailsArray">
+        <!-- FormArray for emails with multiple controls -->
       </div>
+      <button type="button" id="addEmail">Add Email</button>
+    </div>
 
-      <div>
-        <h2>Address Information</h2>
-
-        <!-- Dynamic addresses will be added here -->
-        <div id="dynamicAddresses"></div>
-
-        <button type="button" onclick="addAddress()">Add Address</button>
-        <button type="button" onclick="removeAddress()">Remove Last Address</button>
-        <button id="frmStatus" type="button">Display Form Status</button>
-      </div>
-
-      <button type="submit">Submit</button>
-    </form>
-  </div>
+    <button type="submit">Submit</button>
+  </form>
 
   <script type="module">
-    import PaoForm from './index'
-    const formBuilder = new PaoForm('contactForm');
+      import { FormGroup, FormControl, FormArray } from './index'
+      const Validators = {
+        required: {
+          validator: (value) => !!value,
+          errorMessage: 'This field is required.',
+        },
+        email: {
+          validator: (value) => /\S+@\S+\.\S+/.test(value),
+          errorMessage: 'Invalid email address.',
+        },
+      };
 
-    const Validators = {
-      required: {
-        validate: (value) => !!value.trim(),
-        message: 'This field is required.',
-      },
-      email: {
-        validate: (value) => /\S+@\S+\.\S+/.test(value),
-        message: 'Invalid email address.',
-      },
-    };
+      const form = new FormGroup();
 
-    // Define form controls
-    formBuilder
-      .control('firstName', [Validators.required])
-      .control('lastName', [Validators.required])
-      .control('email', [Validators.required, Validators.email])
-      .control('phone', [Validators.required])
-      .renderFormControls();
+      form.addControl('personalName', '', [Validators.required]);
+      form.addControl('personalEmail', '', [Validators.required, Validators.email]);
 
-    // Debug output
-   // console.log(formBuilder.build());
-    console.log(formBuilder.displayFormStatus());
+      const addressGroup = new FormGroup();
+      addressGroup.addControl('city', '', [Validators.required]);
+      addressGroup.addControl('zipcode', '', [Validators.required]);
+      addressGroup.addControl('country', 'us', [Validators.required]);
 
-    // Render the updated form controls
-    //renderFormControls();
+      form.addGroup('address', addressGroup);
 
-    // Debug output after adding an address
-    //console.log(formBuilder.build());
+      // FormArray for emails with multiple controls
+      const emailsArray = new FormArray();
+      form.addFormArray('emails', emailsArray);
 
-    function addAddress() {
-      // Add an address dynamically
-      formBuilder.addArray('addressArray');
+      document.getElementById('addEmail').addEventListener('click', () => {
+        const emailFormGroup = new FormGroup();
 
-      // Render the updated form controls
-      renderFormControls();
+        emailFormGroup.addControl('email', '', [Validators.required, Validators.email]);
+        emailFormGroup.addControl('label', '', [Validators.required]);
 
-      // Debug output after adding an address
-      console.log(formBuilder.build());
-    }
+        emailsArray.push(emailFormGroup);
 
-    function removeAddress() {
-      // Remove the last item from the addressArray dynamically
-      formBuilder.removeFromArray('addressArray');
+        const emailInput = document.createElement('input');
+        emailInput.type = 'email';
+        emailInput.name = 'email';
+        emailInput.placeholder = 'Enter email';
+        document.getElementById('emailsArray').appendChild(emailInput);
 
-      // Render the updated form controls
-      renderFormControls();
+        const labelInput = document.createElement('input');
+        labelInput.type = 'text';
+        labelInput.name = 'label';
+        labelInput.placeholder = 'Enter label';
+        document.getElementById('emailsArray').appendChild(labelInput);
 
-      // Debug output after removing an address
-      console.log(formBuilder.build());
-    }
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.textContent = 'Remove';
+        document.getElementById('emailsArray').appendChild(removeButton);
 
+        // Reuse addGenericListener for both email and label inputs
+        form.addGenericListener('email');
+        form.addGenericListener('label');
+      });
 
+      function submitForm(event) {
+        event.preventDefault();
+        form.validateAll();
 
-    function generateInputHTML(control)  {
-      return `<label for="${control.id}">${control.name}</label>
-        <input type="text" id="${control.id}" name="${control.name}">
-        <div id="${control.id}Error" class="error-message"></div>`;
-    }
+        if (form.valid) {
+          const formData = form.value;
+          console.log('Form Data:', formData);
+        } else {
+          console.log('Form is not valid. Please correct the errors.');
+        }
+      }
 
+      const formElement = document.getElementById('myForm');
+      formElement.addEventListener('submit', submitForm);
 
-    //document.getElementById('frmStatus').addEventListener('click', displayFormStatus);
+      // Trigger validation on initial load for all form fields
+      form.validateAll();
   </script>
+
 </body>
 </html>
