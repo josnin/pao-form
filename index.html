@@ -110,6 +110,7 @@
         // trigger validation
         form.validateAll();
         
+        console.log(form.controls.emails.controls)
 
       });
 
@@ -137,7 +138,13 @@
       // set value
       form.setValue('personalName', 'John Doe'); // value setter
       form.setValue('personalEmail', 'abc@com'); // value setter
-      form.setValue('country', 'ca'); // value setter
+
+      // how to setValue if belongs to FormGroup
+      form.controls.address.setValue('country', 'ca'); // value setter
+      
+
+      // how to setValue if belongs to FormArray
+      //form.controls.emails.controls.setValue('country', 'ca'); // value setter
 
       /// display value
       console.log(form.controls.personalEmail.value)

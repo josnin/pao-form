@@ -124,9 +124,21 @@ export class FormGroup {
       if (this.controls[name] instanceof FormControl) {
         let element = document.getElementById(name);
 
-        // set element value by the controls value
-        // @ts-ignore
-        element.value = this.controls[name].value
+
+        //if (element && element.tagName.toLowerCase() === 'select') {
+        //  // Handle <select> element value setting
+        //  const options = Array.from((element as HTMLSelectElement).options);
+        //  options.forEach(option => {
+        //    option.selected = option.value == value;
+        //  });
+        //} else {
+        //  // set element value by the controls value
+        //  // @ts-ignore
+        //  element.value = this.controls[name].value
+        //}
+          // @ts-ignore
+          element.value = this.controls[name].value
+
 
         // execute validator for this control
         this.controls[name].validateAll();
