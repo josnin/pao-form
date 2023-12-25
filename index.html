@@ -89,21 +89,21 @@
       document.getElementById('addEmail').addEventListener('click', () => {
 
         const emailInput = document.createElement('input');
+        let uniqId = `email${emailsArray.controls.length}`;
         emailInput.type = 'email';
-        emailInput.id = `email${emailsArray.controls.length}`;
-        emailInput.name = `email${emailsArray.controls.length}`;
+        emailInput.id = uniqId;
+        emailInput.name = uniqId;
         emailInput.placeholder = 'Enter email';
         document.getElementById('emailsArray').appendChild(emailInput);
 
         const emailInputError = document.createElement('div');
-        emailInputError.id = `email${emailsArray.controls.length}Error`;
+        emailInputError.id = uniqId;
         emailInputError.className = 'error-message';
         document.getElementById('emailsArray').appendChild(emailInputError);
 
         // of course document should b ready first
         const emailFormGroup = new FormGroup();
-
-        emailFormGroup.addControl(`email${emailsArray.controls.length}`, '', [Validators.required, Validators.email]);
+        emailFormGroup.addControl(uniqId, '', [Validators.required, Validators.email]);
 
         emailsArray.push(emailFormGroup);
 
