@@ -203,7 +203,7 @@ export class FormGroup {
   showErrorMessage(name: string, errorMessage: string): void {
     const errorElement = document.getElementById(`${name}Error`);
     if (!errorElement) {
-      console.warn(`Error element for control '${name}' is missing in the template.`);
+      console.warn(`Error: Missing error element for control '${name}' in the template. Add a <div id="${name}Error"></div> for error messages.`);
     }
     if (errorElement) {
       errorElement.innerHTML = `<div>${errorMessage}</div>`;
