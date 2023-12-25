@@ -97,9 +97,10 @@ export class FormGroup {
     return Object.values(this.controls).every(control => control.valid);
   }
 
+  // FormGroup setControlValue
   setControlValue(name: string, value: any): void {
     const control = this.controls[name];
-    console.log(control)
+    console.log(control, control instanceof FormGroup)
     if (control instanceof FormGroup || control instanceof FormArray) {
       // @ts-ignore
       control.setControlValue(name, value);
@@ -113,6 +114,9 @@ export class FormGroup {
   validateControl(name: string): void {
     if (this.controls[name]) {
       if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
+        let element = document.getElementById(name);
+        // @ts-ignore
+        element.value = this.controls[name].value
         this.controls[name].validateAll();
         this.displayErrorMessage(name)
         console.log('going here?????')
@@ -183,6 +187,9 @@ export class FormGroup {
 
   showErrorMessage(name: string, errorMessage: string): void {
     const errorElement = document.getElementById(`${name}Error`);
+    if (!errorElement) {
+      console.warn(`Error element for control '${name}' is missing in the template.`);
+    }
     if (errorElement) {
       errorElement.innerHTML = `<div>${errorMessage}</div>`;
     }
@@ -190,6 +197,9 @@ export class FormGroup {
 
   hideErrorMessage(name: string): void {
     const errorElement = document.getElementById(`${name}Error`);
+    if (!errorElement) {
+      console.warn(`Error: Missing error element for control '${name}' in the template. Add a <div id="${name}Error"></div> for error messages.`);
+    }
     if (errorElement) {
       errorElement.innerHTML = ''; // Clear all error messages
     }

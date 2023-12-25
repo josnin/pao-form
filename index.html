@@ -97,7 +97,7 @@
         document.getElementById('emailsArray').appendChild(emailInput);
 
         const emailInputError = document.createElement('div');
-        emailInputError.id = uniqId;
+        emailInputError.id = `${uniqId}Error`;
         emailInputError.className = 'error-message';
         document.getElementById('emailsArray').appendChild(emailInputError);
 
@@ -114,13 +114,11 @@
       });
 
 
-      //form.setControlValue('personalName', 'John Doe'); // value setter
-      //form.validateControl('personalName') // will update value & error
-      //form.validateAll()
 
       function submitForm(event) {
         event.preventDefault();
         form.validateAll();
+
 
         if (form.valid) {
           const formData = form.value;
@@ -135,6 +133,13 @@
 
       // Trigger validation on initial load for all form fields
       form.validateAll();
+
+      // test if can set value
+      //form.setControlValue('personalName', 'John Doe'); // value setter
+      //form.validateControl('personalName') // will update value & error
+      //form.setControlValue('personalEmail', 'abc@com'); // value setter
+      //console.log(form.controls['personalEmail'].value)
+      //form.validateControl('personalEmail') // will update value & error
   </script>
 
 </body>
