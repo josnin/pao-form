@@ -134,12 +134,13 @@
       // Trigger validation on initial load for all form fields
       form.validateAll();
 
-      // test if can set value
-      //form.setControlValue('personalName', 'John Doe'); // value setter
-      //form.validateControl('personalName') // will update value & error
-      //form.setControlValue('personalEmail', 'abc@com'); // value setter
-      //console.log(form.controls['personalEmail'].value)
-      //form.validateControl('personalEmail') // will update value & error
+      // set value
+      form.setValue('personalName', 'John Doe'); // value setter
+      form.setValue('personalEmail', 'abc@com'); // value setter
+      form.setValue('country', 'ca'); // value setter
+
+      /// display value
+      console.log(form.controls.personalEmail.value)
   </script>
 
 </body>

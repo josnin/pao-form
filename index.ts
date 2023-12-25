@@ -98,31 +98,43 @@ export class FormGroup {
   }
 
   // FormGroup setControlValue
-  setControlValue(name: string, value: any): void {
+  setValue(name: string, value: any): void {
     const control = this.controls[name];
-    console.log(control, control instanceof FormGroup)
-    if (control instanceof FormGroup || control instanceof FormArray) {
-      // @ts-ignore
-      control.setControlValue(name, value);
-    } else {
+    //if (control instanceof FormGroup || control instanceof FormArray) {
+    //  // @ts-ignore
+    //  //control.setValue(name, value);
+    //} else {
+    //  control.value = value;
+    //  control.dirty = true;
+    //  this.validate(name); // auto validate 
+    //}
+    if (control instanceof FormControl) {
       control.value = value;
       control.dirty = true;
+      this.validate(name); // auto validate 
     }
   }
 
 
-  validateControl(name: string): void {
+  validate(name: string): void {
     if (this.controls[name]) {
-      if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
+
+      // make sure it coming from FormControl instance
+      //if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
+      if (this.controls[name] instanceof FormControl) {
         let element = document.getElementById(name);
+
+        // set element value by the controls value
         // @ts-ignore
         element.value = this.controls[name].value
+
+        // execute validator for this control
         this.controls[name].validateAll();
+
+        // then display error message ( if any )
         this.displayErrorMessage(name)
-        console.log('going here?????')
       }
     }
-    console.log('is triggered initally?')
   }
 
   displayErrorMessage(name: string) {
@@ -137,16 +149,19 @@ export class FormGroup {
 
   validateAll() { // FormGroup validateAll
     for (const name in this.controls) {
-      if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
-        this.controls[name].validateAll();
-      } else {
-        this.controls[name].validateAll();
-      }
+      //if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
+      //  this.controls[name].validateAll();
+      //} else {
+      //  this.controls[name].validateAll();
+      //}
+
+      this.controls[name].validateAll();
 
       let element = document.getElementById(name);
-      // @ts-ignore
       console.log(name)
+      // @ts-ignore
       element.value = this.controls[name].value
+
       this.displayErrorMessage(name) // @todo should apply for all?
     }
   }
@@ -158,8 +173,8 @@ export class FormGroup {
 
       if (element) {
         const listener = (event: Event) => {
-          this.setControlValue(name, (event.target as HTMLInputElement).value);
-          this.validateControl(name);
+          this.setValue(name, (event.target as HTMLInputElement).value);
+          this.validate(name);
         };
 
         // Use 'change' event for select elements, 'input' for others
