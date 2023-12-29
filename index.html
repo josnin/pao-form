@@ -112,6 +112,7 @@
         form.validateAll();
         
         console.log(form.controls.emails.controls)
+        console.log(form)
 
       });
 
@@ -151,25 +152,48 @@
       console.log(form.controls.personalEmail.value)
 
 
-      // Subscribe to value changes by control
-      form.controls.personalEmail.subscribe(value => {
-        console.log('Value changed:', value);
-      });
+      // Subscribe to value changes specific control
+      //form.controls.personalEmail.subscribe(value => {
+      //  console.log('Value changed:', value);
+      //});
 
       // Subscribe to value changes for all
       //form.subscribe(value => {
       //  console.log('Value changed:', value);
       //});
 
-      //control.setValue('New Value');
+      // Subscribe to value changes for nested group?
+      //form.controls.address.subscribe(value => {
+      //  console.log('Value changed of address group:', value);
+      //});
+
+      // Subscribe to value changes for nested group? (Short cut)
+      addressGroup.subscribe(value => {
+        console.log('Value changed of address group:', value);
+      });
+
+      // Subscribe to value changes for array
+      //form.controls.emails.subscribe(value => {
+      //  console.log('Value changed of array:', value);
+      //})
+
+      console.log(form)
+
 
       document.getElementById('tsubscriber').addEventListener('click', () => {
         // Update the value, triggering the subscription  . it will only trigger if defined using form.subscribe
-        //form.setValue('personalEmail', 'abcdef@com'); // value setter
+        //form.setValue('personalEmail', new Date()); // value setter
 
 
         // if form.controls.personalEmail.subscribe
-        form.controls.personalEmail.setValue(new Date());
+        //form.controls.personalEmail.setValue(new Date());
+
+        // nested group if form.controls.address.subscribe
+        // @todo any shortcut for this?
+        //form.controls.address.controls.city.setValue(new Date());
+
+        // nested group shortcut? if form.controls.address.subscribe
+        addressGroup.setValue('city', new Date());
 
 
       })
