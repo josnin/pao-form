@@ -50,11 +50,12 @@
       <button type="button" id="addEmail">Add Email</button>
     </div>
 
+      <button type="button" id="tsubscriber">Trigger Subscriber</button>
     <button type="submit">Submit</button>
   </form>
 
   <script type="module">
-      import { FormGroup, FormControl, FormArray } from './index'
+      import { FormGroup, FormControl, FormArray } from './src/pao-form'
       const Validators = {
         required: {
           validator: (value) => !!value,
@@ -148,6 +149,29 @@
 
       /// display value
       console.log(form.controls.personalEmail.value)
+
+
+      // Subscribe to value changes by control
+      form.controls.personalEmail.subscribe(value => {
+        console.log('Value changed:', value);
+      });
+
+      // Subscribe to value changes for all
+      //form.subscribe(value => {
+      //  console.log('Value changed:', value);
+      //});
+
+      //control.setValue('New Value');
+
+      document.getElementById('tsubscriber').addEventListener('click', () => {
+        // Update the value, triggering the subscription  . it will only trigger if defined using form.subscribe
+        //form.setValue('personalEmail', 'abcdef@com'); // value setter
+
+
+        // if form.controls.personalEmail.subscribe
+        form.controls.personalEmail.setValue(new Date());
+
+      })
   </script>
 
 </body>
