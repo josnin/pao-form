@@ -35,6 +35,8 @@ export class FormControl {
     if (this.parent) {
         this.parent.setValue(this.name, newVal);
         this.valueChangeEmitter.emit(newVal); // Notify subscribers
+    } else {
+        console.warn(`Error: Missing Parent FormGroup, FormControl ${this.name} is not assigned to any parent FormGroup`)
     }
   }
 
@@ -86,7 +88,7 @@ export class FormGroup {
   }
 
   addControl(name: string, initialValue = '', validators: Validator[] = []): void {
-    let control = new FormControl(initialValue, validators);
+    const control = new FormControl(initialValue, validators);
 
     // @ts-ignore
     control.name = name;
@@ -213,6 +215,10 @@ export class FormGroup {
         const listener = (event: Event) => {
           this.setValue(name, (event.target as HTMLInputElement).value);
           this.validate(name);
+
+          // update subcscriber , is this expensive??? 
+          // @ts-ignore
+          this.controls[name].valueChangeEmitter.emit((event.target as HTMLInputElement).value); // Notify subscribers
         };
 
         // Use 'change' event for select elements, 'input' for others
