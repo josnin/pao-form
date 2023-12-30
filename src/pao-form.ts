@@ -93,13 +93,11 @@ export class FormGroup {
   controls: FormControls;
   //controls: { [key: string]: FormControl | FormGroup | FormArray };
   eventListeners: Record<string, { eventName: string; listener: EventListenerOrEventListenerObject }>;
-  customErrorMessages: Record<string, string>;
   private valueChangeEmitter = new EventEmitter();
 
   constructor() {
     this.controls = {};
     this.eventListeners = {};
-    this.customErrorMessages = {};
   }
 
   addControl(name: string, initialValue = '', validators: Validator[] = []): void {
@@ -270,7 +268,7 @@ export class FormGroup {
       // @ts-ignore
       for (const { validator, errorMessage } of control.validators) {
         if (!validator(control.value)) {
-          return this.customErrorMessages[name] || errorMessage;
+          return errorMessage;
         }
       }
     }
