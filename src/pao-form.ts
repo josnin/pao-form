@@ -305,4 +305,9 @@ class EventEmitter {
   clearAllListeners(): void {
     this.listeners = {};
   }
+
+  clearListeners(controlName: string): void {
+    delete this.listeners[controlName];
+  }
+
 }
