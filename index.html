@@ -87,6 +87,8 @@
       const emailsArray = new FormArray();
       form.addFormArray('emails', emailsArray);
 
+      const emailFormGroup = new FormGroup();
+
       document.getElementById('addEmail').addEventListener('click', () => {
 
         const emailInput = document.createElement('input');
@@ -103,7 +105,6 @@
         document.getElementById('emailsArray').appendChild(emailInputError);
 
         // of course document should b ready first
-        const emailFormGroup = new FormGroup();
         emailFormGroup.addControl(uniqId, '', [Validators.required, Validators.email]);
 
         emailsArray.push(emailFormGroup);
@@ -113,8 +114,11 @@
         
         console.log(form.controls.emails.controls)
         console.log(form)
+        console.log(emailsArray.value)
 
       });
+      document.getElementById('addEmail').click();
+      document.getElementById('addEmail').click();
 
 
 
@@ -137,16 +141,10 @@
       // Trigger validation on initial load for all form fields
       form.validateAll();
 
-      // set value
-      form.setValue('personalName', 'John Doe'); // value setter
-      form.setValue('personalEmail', 'abc@com'); // value setter
+      //// set value
+      //form.setValue('personalName', 'John Doe'); // value setter
+      //form.setValue('personalEmail', 'abc@com'); // value setter
 
-      // how to setValue if belongs to FormGroup
-      form.controls.address.setValue('country', 'ca'); // value setter
-      
-
-      // how to setValue if belongs to FormArray
-      //form.controls.emails.controls.setValue('country', 'ca'); // value setter
 
       /// display value
       console.log(form.controls.personalEmail.value)
@@ -157,43 +155,42 @@
       //  console.log('Value changed:', value);
       //});
 
-      // Subscribe to value changes for all
-      //form.subscribe(value => {
-      //  console.log('Value changed:', value);
-      //});
-
-      // Subscribe to value changes for nested group?
-      //form.controls.address.subscribe(value => {
-      //  console.log('Value changed of address group:', value);
-      //});
-
-      // Subscribe to value changes for nested group? (Short cut)
-      addressGroup.subscribe(value => {
-        console.log('Value changed of address group:', value);
+      // Subscribe to value changes 
+      form.subscribe('personalEmail', value => {
+        console.log('Value changed personal email:', value);
       });
 
-      // Subscribe to value changes for array
-      //form.controls.emails.subscribe(value => {
-      //  console.log('Value changed of array:', value);
-      //})
+      // Subscribe to value changes for nested group control?
+      addressGroup.subscribe('city', value => {
+        console.log('Value changed of address group city:', value);
+      });
+
+      addressGroup.subscribe('country', value => {
+        console.log('Value changed of address group country:', value);
+      });
+
 
       console.log(form)
+
+      // Subscribe to value changes for array
+      // emailFormGroup is assigned to an array
+      //emailFormGroup.subscribe(value => {
+      //  console.log('Value changed of array > emailFormGroup:', value);
+      //})
 
 
       document.getElementById('tsubscriber').addEventListener('click', () => {
         // Update the value, triggering the subscription  . it will only trigger if defined using form.subscribe
-        //form.setValue('personalEmail', new Date()); // value setter
+        form.setValue('personalEmail', new Date()); // value setter
 
-
-        // if form.controls.personalEmail.subscribe
-        //form.controls.personalEmail.setValue(new Date());
-
-        // nested group if form.controls.address.subscribe
-        // @todo any shortcut for this?
-        //form.controls.address.controls.city.setValue(new Date());
-
-        // nested group shortcut? if form.controls.address.subscribe
+        // Subscribe to value changes for nested group control?
+        // addressGroup.subscribe('city', value => {
         addressGroup.setValue('city', new Date());
+        addressGroup.setValue('country', 'ca');
+
+      // Subscribe to value changes for array
+      // emailFormGroup is assigned to an array
+      //emailsArray.setValue(['ab', 'hhy'])
 
 
       })

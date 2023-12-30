@@ -11,19 +11,19 @@ interface FormControls {
 
 export class FormControl {
   value: string;
-  name: string = '';
+  //name: string = '';
   validators: Validator[];
   valid: boolean;
   dirty: boolean;
-  private valueChangeEmitter = new EventEmitter();
-  parent: FormGroup | null = null; // Reference to the parent FormGroup
+  //private valueChangeEmitter = new EventEmitter();
+  //parent: FormGroup | null = null; // Reference to the parent FormGroup
 
   constructor(initialValue = '', validators: Validator[] = []) {
     this.value = initialValue;
     this.validators = validators;
     this.valid = validators.every(({ validator }) => validator(initialValue));
     this.dirty = false;
-    this.valueChangeEmitter.emit(this.value); // Notify subscribers
+    //this.valueChangeEmitter.emit(this.value); // Notify subscribers
   }
 
   validateAll(): void { // FormControl validateAll
@@ -31,18 +31,18 @@ export class FormControl {
     this.valid = this.validators.every(({ validator }) => validator(this.value));
   }
 
-  setValue(newVal: string): void {
-    if (this.parent) {
-        this.parent.setValue(this.name, newVal);
-        this.valueChangeEmitter.emit(newVal); // Notify subscribers
-    } else {
-        console.warn(`Error: Missing Parent FormGroup, FormControl ${this.name} is not assigned to any parent FormGroup`)
-    }
-  }
+  //setValue(newVal: string): void {
+  //  if (this.parent) {
+  //      this.parent.setValue(this.name, newVal);
+  //      this.valueChangeEmitter.emit(this.name, newVal); // Notify subscribers
+  //  } else {
+  //      console.warn(`Error: Missing Parent FormGroup, FormControl ${this.name} is not assigned to any parent FormGroup`)
+  //  }
+  //}
 
-  subscribe(callback: (value: any) => void): void {
-    this.valueChangeEmitter.subscribe(callback);
-  }
+  //subscribe(controlName: string, callback: (value: any) => void): void {
+  //  this.valueChangeEmitter.subscribe(controlName, callback);
+  //}
 }
 
 export class FormArray {
@@ -72,6 +72,21 @@ export class FormArray {
   validateAll(): void { // FormArray validateAll
     this.controls.forEach(control => control.validateAll());
   }
+
+  setValue(values: any[]): void { // FormArray
+    this.controls.forEach((control, index) => {
+      if (control instanceof FormGroup || control instanceof FormArray) {
+        //control.setValue(control.name, values[index]);
+        // @ts-ignore
+        control.setValue(values[index]);
+      } else if (control instanceof FormControl) {
+        control.value = values[index];
+        control.dirty = true;
+      }
+    });
+
+  }
+
 }
 
 export class FormGroup {
@@ -91,9 +106,9 @@ export class FormGroup {
     const control = new FormControl(initialValue, validators);
 
     // @ts-ignore
-    control.name = name;
+    // control.name = name;
     // @ts-ignore
-    control.parent = this;
+    // control.parent = this;
     
     this.controls[name] = control;
     this.addGenericListener(name);
@@ -127,20 +142,21 @@ export class FormGroup {
   // FormGroup setControlValue
   setValue(name: string, value: any): void {
     const control = this.controls[name];
-    //if (control instanceof FormGroup || control instanceof FormArray) {
-    //  // @ts-ignore
-    //  //control.setValue(name, value);
-    //} else {
-    //  control.value = value;
-    //  control.dirty = true;
-    //  this.validate(name); // auto validate 
-    //}
-    if (control instanceof FormControl) {
+    if (control instanceof FormGroup || control instanceof FormArray) {
+      // @ts-ignore
+      control.setValue(name, value);
+    } else if (control instanceof FormControl) {
       control.value = value;
       control.dirty = true;
       this.validate(name); // auto validate 
-      this.valueChangeEmitter.emit(value); // Notify subscribers
+      this.valueChangeEmitter.emit(name, value); // Notify subscribers
     }
+    //if (control instanceof FormControl) {
+    //  control.value = value;
+    //  control.dirty = true;
+    //  this.validate(name); // auto validate 
+    //  this.valueChangeEmitter.emit(value); // Notify subscribers
+    //}
   }
 
 
@@ -152,21 +168,8 @@ export class FormGroup {
       if (this.controls[name] instanceof FormControl) {
         let element = document.getElementById(name);
 
-
-        //if (element && element.tagName.toLowerCase() === 'select') {
-        //  // Handle <select> element value setting
-        //  const options = Array.from((element as HTMLSelectElement).options);
-        //  options.forEach(option => {
-        //    option.selected = option.value == value;
-        //  });
-        //} else {
-        //  // set element value by the controls value
-        //  // @ts-ignore
-        //  element.value = this.controls[name].value
-        //}
-          // @ts-ignore
-          element.value = this.controls[name].value
-
+        // @ts-ignore
+        element.value = this.controls[name].value
 
         // execute validator for this control
         this.controls[name].validateAll();
@@ -215,10 +218,6 @@ export class FormGroup {
         const listener = (event: Event) => {
           this.setValue(name, (event.target as HTMLInputElement).value);
           this.validate(name);
-
-          // update subcscriber , is this expensive??? 
-          // @ts-ignore
-          this.controls[name].valueChangeEmitter.emit((event.target as HTMLInputElement).value); // Notify subscribers
         };
 
         // Use 'change' event for select elements, 'input' for others
@@ -264,10 +263,6 @@ export class FormGroup {
     }
   }
 
-  setCustomErrorMessage(name: string, errorMessage: string): void {
-    this.customErrorMessages[name] = errorMessage;
-  }
-
   getErrorMessage(name: string) {
     const control = this.controls[name];
     // @ts-ignore
@@ -283,8 +278,8 @@ export class FormGroup {
   
   }
 
-  subscribe(callback: (value: any) => void): void {
-    this.valueChangeEmitter.subscribe(callback);
+  subscribe(controlName: string, callback: (value: any) => void): void {
+    this.valueChangeEmitter.subscribe(controlName, callback);
   }
 
 
@@ -292,13 +287,22 @@ export class FormGroup {
 
 
 class EventEmitter {
-  private listeners: ((value: any) => void)[] = [];
+  private listeners: { [key: string]: ((value: any) => void)[] } = {};
 
-  subscribe(callback: (value: any) => void): void {
-    this.listeners.push(callback);
+  subscribe(controlName: string, callback: (value: any) => void): void {
+    if (!this.listeners[controlName]) {
+      this.listeners[controlName] = [];
+    }
+    this.listeners[controlName].push(callback);
   }
 
-  emit(value: any): void {
-    this.listeners.forEach(listener => listener(value));
+  emit(controlName: string, value: any): void {
+    if (this.listeners[controlName]) {
+      this.listeners[controlName].forEach(listener => listener(value));
+    }
+  }
+
+  clearAllListeners(): void {
+    this.listeners = {};
   }
 }
