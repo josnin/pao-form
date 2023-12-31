@@ -91,7 +91,6 @@ export class FormArray {
 
 export class FormGroup {
   controls: FormControls;
-  //controls: { [key: string]: FormControl | FormGroup | FormArray };
   eventListeners: Record<string, { eventName: string; listener: EventListenerOrEventListenerObject }>;
   private valueChangeEmitter = new EventEmitter();
 
@@ -149,32 +148,21 @@ export class FormGroup {
       this.validate(name); // auto validate 
       this.valueChangeEmitter.emit(name, value); // Notify subscribers
     }
-    //if (control instanceof FormControl) {
-    //  control.value = value;
-    //  control.dirty = true;
-    //  this.validate(name); // auto validate 
-    //  this.valueChangeEmitter.emit(value); // Notify subscribers
-    //}
   }
 
 
   validate(name: string): void {
     if (this.controls[name]) {
+      let element = document.getElementById(name);
 
-      // make sure it coming from FormControl instance
-      //if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
-      if (this.controls[name] instanceof FormControl) {
-        let element = document.getElementById(name);
+      // @ts-ignore
+      element.value = this.controls[name].value
 
-        // @ts-ignore
-        element.value = this.controls[name].value
+      // execute validator for this control
+      this.controls[name].validateAll();
 
-        // execute validator for this control
-        this.controls[name].validateAll();
-
-        // then display error message ( if any )
-        this.displayErrorMessage(name)
-      }
+      // then display error message ( if any )
+      this.displayErrorMessage(name)
     }
   }
 
@@ -190,20 +178,7 @@ export class FormGroup {
 
   validateAll() { // FormGroup validateAll
     for (const name in this.controls) {
-      //if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray)) {
-      //  this.controls[name].validateAll();
-      //} else {
-      //  this.controls[name].validateAll();
-      //}
-
-      this.controls[name].validateAll();
-
-      let element = document.getElementById(name);
-      console.log(name)
-      // @ts-ignore
-      element.value = this.controls[name].value
-
-      this.displayErrorMessage(name) // @todo should apply for all?
+      this.validate(name);
     }
   }
   
