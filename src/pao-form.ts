@@ -75,15 +75,23 @@ export class FormArray {
 
   setValue(values: any[]): void { // FormArray
     this.controls.forEach((control, index) => {
-      if (control instanceof FormGroup || control instanceof FormArray) {
-        //control.setValue(control.name, values[index]);
-        // @ts-ignore
-        control.setValue(values[index]);
-      } else if (control instanceof FormControl) {
-        control.value = values[index];
-        control.dirty = true;
+      if (control instanceof FormGroup || control instanceof FormArray || control instanceof FormControl) {
+        if (values[index] !== undefined) {
+          // @ts-ignore
+          control.setValue(values[index]);
+        }
       }
     });
+    //this.controls.forEach((control, index) => {
+    //  if (control instanceof FormGroup || control instanceof FormArray) {
+    //    //control.setValue(control.name, values[index]);
+    //    // @ts-ignore
+    //    control.setValue(values[index]);
+    //  } else if (control instanceof FormControl) {
+    //    control.value = values[index];
+    //    control.dirty = true;
+    //  }
+    //});
 
   }
 
@@ -228,9 +236,6 @@ export class FormGroup {
 
   hideErrorMessage(name: string): void {
     const errorElement = document.getElementById(`${name}Error`);
-    if (!errorElement) {
-      console.warn(`Error: Missing error element for control '${name}' in the template. Add a <div id="${name}Error"></div> for error messages.`);
-    }
     if (errorElement) {
       errorElement.innerHTML = ''; // Clear all error messages
     }

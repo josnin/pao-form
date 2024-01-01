@@ -55,7 +55,204 @@
   </form>
 
   <script type="module">
-      import { FormGroup, FormControl, FormArray } from './src/pao-form'
+      //import { FormGroup, FormControl, FormArray } from './src/pao-form'
+      import { FormGroup, FormControl, FormArray } from './index'
+//      const Validators = {
+//        required: {
+//          validator: (value) => !!value,
+//          errorMessage: 'This field is required.',
+//        },
+//        email: {
+//          validator: (value) => /\S+@\S+\.\S+/.test(value),
+//          errorMessage: 'Invalid email address.',
+//        },
+//        validCountry: {
+//          validator: (value) => value == 'us',
+//          errorMessage: 'Invalid country!'
+//        }
+//      };
+//
+//      const form = new FormGroup();
+//
+//      form.addControl('personalName', '', [Validators.required]);
+//      form.addControl('personalEmail', '', [Validators.required, Validators.email]);
+//
+//      const addressGroup = new FormGroup();
+//      addressGroup.addControl('city', '', [Validators.required]);
+//      addressGroup.addControl('zipcode', '', [Validators.required]);
+//      addressGroup.addControl('country', 'us', [Validators.required, Validators.validCountry]);
+//
+//      form.addGroup('address', addressGroup);
+//
+//      // FormArray for emails with multiple controls
+//      const emailsArray = new FormArray();
+//      form.addFormArray('emails', emailsArray);
+//
+//      const emailFormGroup = new FormGroup();
+//
+//      document.getElementById('addEmail').addEventListener('click', () => {
+//
+//        const emailInput = document.createElement('input');
+//        let uniqId = `email${emailsArray.controls.length}`;
+//        emailInput.type = 'email';
+//        emailInput.id = uniqId;
+//        emailInput.name = uniqId;
+//        emailInput.placeholder = 'Enter email';
+//        document.getElementById('emailsArray').appendChild(emailInput);
+//
+//        const emailInputError = document.createElement('div');
+//        emailInputError.id = `${uniqId}Error`;
+//        emailInputError.className = 'error-message';
+//        document.getElementById('emailsArray').appendChild(emailInputError);
+//
+//        // of course document should b ready first
+//        emailFormGroup.addControl(uniqId, '', [Validators.required, Validators.email]);
+//
+//        emailsArray.push(emailFormGroup);
+//
+//        // trigger validation
+//        form.validateAll();
+//        
+//        console.log(form.controls.emails.controls)
+//        console.log(form)
+//        console.log(emailsArray.value)
+//
+//      });
+//      document.getElementById('addEmail').click();
+//      document.getElementById('addEmail').click();
+//
+//
+//
+//      function submitForm(event) {
+//        event.preventDefault();
+//        form.validateAll();
+//
+//
+//        if (form.valid) {
+//          const formData = form.value;
+//          console.log('Form Data:', formData);
+//        } else {
+//          console.log('Form is not valid. Please correct the errors.');
+//        }
+//      }
+//
+//      const formElement = document.getElementById('myForm');
+//      formElement.addEventListener('submit', submitForm);
+//
+//      // Trigger validation on initial load for all form fields
+//      form.validateAll();
+//
+//
+//      /// display value
+//      console.log(form.controls.personalEmail.value)
+//
+//
+//      //// Subscribe to value changes 
+//      //form.subscribe('personalEmail', value => {
+//      //  console.log('Value changed personal email:', value);
+//      //});
+//
+//      //// Subscribe to value changes for nested group control?
+//      //addressGroup.subscribe('city', value => {
+//      //  console.log('Value changed of address group city:', value);
+//      //});
+//
+//      //addressGroup.subscribe('country', value => {
+//      //  console.log('Value changed of address group country:', value);
+//      //});
+//
+//
+//      console.log(form)
+//
+//      // Subscribe to value changes for array
+//      // emailFormGroup is assigned to an array
+//      //emailsArray.subscribe(value => {
+//      //  console.log('Value changed of array > emailsArray:', value);
+//      //})
+//
+//
+//      document.getElementById('tsubscriber').addEventListener('click', () => {
+//        //// Update the value, triggering the subscription  . it will only trigger if defined using form.subscribe
+//        //form.setValue('personalEmail', new Date()); // value setter
+//
+//        //// Subscribe to value changes for nested group control?
+//        //// addressGroup.subscribe('city', value => {
+//        //addressGroup.setValue('city', new Date());
+//        //addressGroup.setValue('country', 'ca');
+//
+//      // Subscribe to value changes for array
+//      // emailFormGroup is assigned to an array
+//      console.log(1)
+//      emailsArray.setValue(['ab', 'hhy'])
+//
+//
+//      })
+
+  // Example usage:
+/// new examples +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+//  // Create a FormArray with a list of FormGroup instances
+//  const formArray = new FormArray();
+//  
+//  // Create a couple of FormGroup instances with their own controls
+//  const group1 = new FormGroup();
+//  const nameCtrl = new FormControl('John');
+//  group1.addControl('name', nameCtrl);
+//  group1.addControl('name', new FormControl('John'));
+//  group1.addControl('age', new FormControl(25));
+//  
+//  const group2 = new FormGroup();
+//  group2.addControl('name', new FormControl('Alice'));
+//  group2.addControl('age', new FormControl(30));
+//  
+//  // Add the FormGroup instances to the FormArray
+//  formArray.push(group1);
+//  formArray.push(group2);
+//  
+//  // Subscribe to changes in the entire formArray
+//  formArray.subscribe(value => {
+//    console.log('FormArray value changed:', value);
+//  });
+//  
+//  // Subscribe to changes in the 'name' control of the first FormGroup
+//  group1.subscribeControl('name', value => {
+//    console.log('Name in Group1 changed:', value);
+//  });
+//
+//  // Subscribe to changes in the 'name' control 
+//  nameCtrl.subscribe(value => {
+//    console.log('Name control changed:', value);
+//  });
+//  
+//  // Set new values for the FormArray, triggering the subscriptions
+//  formArray.setValue([
+//    { name: 'Bob', age: 28 },
+//    { name: 'Eve', age: 35 }
+//  ]);
+//  
+//  // Log the final values
+//  console.log(formArray.getValue());
+//
+//  // Set new values for the FormArray, triggering the subscriptions
+//  //formArray.setValue([
+//  //  { name: 'Jong', age: 28 },
+//  //  { name: 'Pao', age: 35 }
+//  //]);
+//
+//  // Log the final values
+//  console.log(formArray.getValue());
+//      document.getElementById('tsubscriber').addEventListener('click', () => {
+//        //formArray.setValue([
+//        //  { name: 'Jong', age: 28 },
+//        //  { name: 'Pao', age: new Date() }
+//        //]);
+//
+//        group1.setValue({ name: new Date() })
+//        nameCtrl.setValue(new Date())
+//        //console.log(group1.getValue())
+//
+//
+//      })
+//
       const Validators = {
         required: {
           validator: (value) => !!value,
@@ -83,19 +280,20 @@
 
       form.addGroup('address', addressGroup);
 
-      // FormArray for emails with multiple controls
+      form.validateAll();
+
       const emailsArray = new FormArray();
       form.addFormArray('emails', emailsArray);
 
-      const emailFormGroup = new FormGroup();
 
       document.getElementById('addEmail').addEventListener('click', () => {
+        const emailFormGroup = new FormGroup();
 
         const emailInput = document.createElement('input');
         let uniqId = `email${emailsArray.controls.length}`;
         emailInput.type = 'email';
         emailInput.id = uniqId;
-        emailInput.name = uniqId;
+        //emailInput.name = 'email';
         emailInput.placeholder = 'Enter email';
         document.getElementById('emailsArray').appendChild(emailInput);
 
@@ -116,84 +314,29 @@
         console.log(form)
         console.log(emailsArray.value)
 
+        form.setValue({ personalName: new Date() })
+
       });
       document.getElementById('addEmail').click();
       document.getElementById('addEmail').click();
 
-
-
-      function submitForm(event) {
-        event.preventDefault();
-        form.validateAll();
-
-
-        if (form.valid) {
-          const formData = form.value;
-          console.log('Form Data:', formData);
-        } else {
-          console.log('Form is not valid. Please correct the errors.');
-        }
-      }
-
-      const formElement = document.getElementById('myForm');
-      formElement.addEventListener('submit', submitForm);
-
-      // Trigger validation on initial load for all form fields
-      form.validateAll();
-
-      //// set value
-      //form.setValue('personalName', 'John Doe'); // value setter
-      //form.setValue('personalEmail', 'abc@com'); // value setter
-
-
-      /// display value
-      console.log(form.controls.personalEmail.value)
-
-
-      // Subscribe to value changes specific control
-      //form.controls.personalEmail.subscribe(value => {
-      //  console.log('Value changed:', value);
-      //});
-
-      // Subscribe to value changes 
-      form.subscribe('personalEmail', value => {
-        console.log('Value changed personal email:', value);
+      form.subscribeControl('personalName', value => {
+        console.log('personalName in Form changed:', value);
       });
 
-      // Subscribe to value changes for nested group control?
-      addressGroup.subscribe('city', value => {
-        console.log('Value changed of address group city:', value);
-      });
-
-      addressGroup.subscribe('country', value => {
-        console.log('Value changed of address group country:', value);
-      });
-
-
-      console.log(form)
-
-      // Subscribe to value changes for array
-      // emailFormGroup is assigned to an array
-      //emailFormGroup.subscribe(value => {
-      //  console.log('Value changed of array > emailFormGroup:', value);
-      //})
-
-
+      emailsArray.subscribe(value => {
+        console.log('emailsArray email changed:', value);
+      })
       document.getElementById('tsubscriber').addEventListener('click', () => {
-        // Update the value, triggering the subscription  . it will only trigger if defined using form.subscribe
-        form.setValue('personalEmail', new Date()); // value setter
+        emailsArray.setValue([
+          {email0: 'adfs'},
+          {email1: 'abc@email.com'},
+        ])
 
-        // Subscribe to value changes for nested group control?
-        // addressGroup.subscribe('city', value => {
-        addressGroup.setValue('city', new Date());
-        addressGroup.setValue('country', 'ca');
-
-      // Subscribe to value changes for array
-      // emailFormGroup is assigned to an array
-      //emailsArray.setValue(['ab', 'hhy'])
 
 
       })
+
   </script>
 
 </body>
