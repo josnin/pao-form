@@ -75,8 +75,8 @@ export  class FormGroup {
     this.eventListeners = {};
   }
 
-  addControl(name: string, initialValue = '', validators: Validator[] = []): void {
-    const control = new FormControl(initialValue, validators);
+  addControl(name: string, control: FormControl): void {
+    // const control = new FormControl(initialValue, validators);
     control.name = name;
 
     this.controls[name] = control;
