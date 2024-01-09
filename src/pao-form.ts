@@ -75,9 +75,9 @@ export  class FormGroup {
     this.eventListeners = {};
   }
 
-  addControl(name: string, control: FormControl): void {
+  addControl(name: string, control: FormControl | FormGroup | FormArray): void {
     // const control = new FormControl(initialValue, validators);
-    control.name = name;
+    if (control instanceof FormControl) control.name = name;
 
     this.controls[name] = control;
     this.addGenericListener(name);
@@ -134,8 +134,9 @@ export  class FormGroup {
   }
 
   validate(name: string): void {
-    if (this.controls[name]) {
-      const element = document.getElementById(name);
+    const element = document.getElementById(name);
+    // validate only if the element exists
+    if (this.controls[name] && element) {
 
       // @ts-ignore
       element.value = this.controls[name].value
@@ -302,4 +303,29 @@ export class FormArray {
     return Object.values(this.controls).every(control => control.valid);
   }
 
+}
+
+
+export class FormBuilder {
+  group(controls: { [key: string]: FormControl | FormGroup | FormArray }): FormGroup {
+    const formGroup = new FormGroup();
+    for (const controlName in controls) {
+      if (controls.hasOwnProperty(controlName)) {
+        formGroup.addControl(controlName, controls[controlName]);
+      }
+    }
+    return formGroup;
+  }
+
+  array(controls: (FormControl | FormGroup | FormArray)[]): FormArray {
+    const formArray = new FormArray();
+    controls.forEach(control => {
+      formArray.controls.push(control);
+    });
+    return formArray;
+  }
+
+  control(value: any, validators: Validator[] = []): FormControl {
+    return new FormControl(value, validators);
+  }
 }
