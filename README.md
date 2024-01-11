@@ -58,12 +58,8 @@ A lightweight form builder library for both TypeScript and plain JavaScript, ins
       console.log('Form value changed:', value);
     });
 
-    // Subscribe to changes in the specific control
-    userFormGroup.subscribeControl('nameControl', value => {
-      console.log('Name control changed:', value);
-    });
-    
-    // Or Subscribe to changes in a specific control
+   
+    // Subscribe to changes in a specific control
     nameControl.subscribe(value => {
       console.log('Name control changed:', value);
     });
@@ -134,16 +130,16 @@ A lightweight form builder library for both TypeScript and plain JavaScript, ins
 ```
 
 ### HTML Element Association
-To associate the form controls with HTML elements, you can use the provided control names when defining your HTML. For example:
+To associate the form controls with HTML elements, you can use the provided control names in element id when defining your HTML. For example:
 ```html
 <!-- Input for 'name' control -->
 <input type="text" id="name" />
-<!-- display of 'name' control validator message -->
+<!-- display of 'name' control validator message by prefixing Error -->
 <div id="nameError"></div>
 
 <!-- Input for 'age' control -->
 <input type="number" id="age"/>
-<!-- display of 'name' control validator message -->
+<!-- display of 'name' control validator message by orefing Error -->
 <div id="ageError"></div>
 
 <!-- Nested group controls -->
