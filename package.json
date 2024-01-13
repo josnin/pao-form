@@ -1,6 +1,6 @@
 {
   "name": "pao-form",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "description": "A lightweight form builder library for both TypeScript and plain JavaScript",
   "keywords": [
     "pao-form",

@@ -20,7 +20,7 @@ A lightweight form builder library for both TypeScript and plain JavaScript, ins
       import { FormBuilder, FormGroup, FormControl, FormArray } from 'pao-form';
 
       // For Plug & Play JavaScript 
-      import { FormBuilder, FormGroup, FormControl, FormArray } from 'https://cdn.jsdelivr.net/npm/jong-router@latest/dist/pao-form.min.js';
+      import { FormBuilder, FormGroup, FormControl, FormArray } from 'https://cdn.jsdelivr.net/npm/pao-form@latest/dist/pao-form.min.js';
 
     ```
 
