@@ -84,6 +84,8 @@ export  class FormGroup {
     this.controls[name] = control;
     this.addGenericListener(name);
 
+    this.validate(name)
+
   }
   
   addGroup(name: string, group: FormGroup): void {
@@ -99,7 +101,7 @@ export  class FormGroup {
     for (const controlName in values) {
       if (values.hasOwnProperty(controlName) && this.controls.hasOwnProperty(controlName)) {
         this.controls[controlName].setValue(values[controlName]);
-        this.validate(controlName); // auto validate 
+        //this.validate(controlName); // auto validate & reassign element value
       }
     }
 
@@ -135,7 +137,7 @@ export  class FormGroup {
     return Object.values(this.controls).every(control => control.valid);
   }
 
-  validate(name: string): void {
+  validate(name: string): void { // this also assign value to element & revalidate
     const element = this.shadowRoot ? this.shadowRoot.getElementById(name) : document.getElementById(name);
     // validate only if the element exists
     if (this.controls[name] && element) {
@@ -162,7 +164,7 @@ export  class FormGroup {
           } else {
             this.setValue({ [name]: (event.target as HTMLInputElement).value });
           }
-          this.validate(name);
+          //this.validate(name);
         };
 
         // Use 'change' event for select elements, 'input' for others
