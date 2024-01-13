@@ -66,13 +66,15 @@ export  class FormControl {
   
 export  class FormGroup {
   controls: { [key: string]: FormControl | FormGroup | FormArray } = {};
+  private readonly shadowRoot? : ShadowRoot;
   private valueChangeEmitter = new EventEmitter();
   name: string = '';
   eventListeners: Record<string, { eventName: string; listener: EventListenerOrEventListenerObject }>;
 
-  constructor() {
+  constructor(shadowRoot?: ShadowRoot) {
     this.controls = {};
     this.eventListeners = {};
+    this.shadowRoot = shadowRoot;
   }
 
   addControl(name: string, control: FormControl | FormGroup | FormArray): void {
@@ -134,7 +136,7 @@ export  class FormGroup {
   }
 
   validate(name: string): void {
-    const element = document.getElementById(name);
+    const element = this.shadowRoot ? this.shadowRoot.getElementById(name) : document.getElementById(name);
     // validate only if the element exists
     if (this.controls[name] && element) {
 
@@ -151,12 +153,15 @@ export  class FormGroup {
 
   addGenericListener(name: string): void {
     if (!(this.controls[name] instanceof FormGroup) && !(this.controls[name] instanceof FormArray) && !this.eventListeners[name]) {
-      const element = document.getElementById(name);
+      const element = this.shadowRoot ? this.shadowRoot.getElementById(name) : document.getElementById(name);
 
       if (element) {
         const listener = (event: Event) => {
-          //this.setValue(name, (event.target as HTMLInputElement).value);
-          this.setValue({ [name]: (event.target as HTMLInputElement).value });
+          if (this.shadowRoot) {
+            this.setValue({ [name]: (event.composedPath()[0] as HTMLInputElement).value });
+          } else {
+            this.setValue({ [name]: (event.target as HTMLInputElement).value });
+          }
           this.validate(name);
         };
 
@@ -188,7 +193,8 @@ export  class FormGroup {
   }
 
   showErrorMessage(name: string, errorMessage: string): void {
-    const errorElement = document.getElementById(`${name}Error`);
+    // @todo duplciate??
+    const errorElement = this.shadowRoot ? this.shadowRoot.getElementById(`${name}Error`) : document.getElementById(`${name}Error`);
     if (!errorElement) {
       console.warn(`Error: Missing error element for control '${name}' in the template. Add a <div id="${name}Error"></div> for error messages.`);
     }
@@ -198,7 +204,7 @@ export  class FormGroup {
   }
 
   hideErrorMessage(name: string): void {
-    const errorElement = document.getElementById(`${name}Error`);
+    const errorElement = this.shadowRoot ? this.shadowRoot.getElementById(`${name}Error`) : document.getElementById(`${name}Error`);
     if (errorElement) {
       errorElement.innerHTML = ''; // Clear all error messages
     }
@@ -237,6 +243,7 @@ export  class FormGroup {
     this.valueChangeEmitter.emit(this.name, this.getValue());
 
   }
+
 
 }
   
@@ -307,8 +314,14 @@ export class FormArray {
 
 
 export class FormBuilder {
+  private readonly shadowRoot? : ShadowRoot;
+
+  constructor(shadowRoot?: ShadowRoot) {
+    this.shadowRoot = shadowRoot;
+  }
+
   group(controls: { [key: string]: FormControl | FormGroup | FormArray }): FormGroup {
-    const formGroup = new FormGroup();
+    const formGroup = new FormGroup(this.shadowRoot);
     for (const controlName in controls) {
       if (controls.hasOwnProperty(controlName)) {
         formGroup.addControl(controlName, controls[controlName]);
