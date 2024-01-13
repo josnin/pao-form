@@ -1,10 +1,11 @@
 {
   "name": "pao-form",
   "version": "0.2.13",
-  "description": "pao-form Form builder",
+  "description": "A lightweight form builder library for both TypeScript and plain JavaScript",
   "keywords": [
-    "jong-router",
-    "web components router",
+    "pao-form",
+    "web components form builder",
+    "JavaScript form builder",
     "custom elements"
   ],
   "main": "dist/pao-form.min.js",
@@ -15,7 +16,11 @@
   },
   "scripts": {
     "dev": "node node_modules/vite/bin/vite.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf src/*.js src/*/*.js samples/*.js samples/*/*.js *.d.ts src/*.d.ts src/*/*.d.ts",
+    "build": "npm run clean &&  tsc -w",
+    "bundle": "npx esbuild --bundle src/pao-form.js --minify --sourcemap --format=esm --outfile=dist/pao-form.min.js --target=es2022 && npm run copy",
+    "copy": "cp -rvf src/*.d.ts dist/."
   },
   "repository": {
     "type": "git",
