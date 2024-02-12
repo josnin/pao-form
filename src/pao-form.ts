@@ -164,7 +164,7 @@ export  class FormGroup {
           } else {
             this.setValue({ [name]: (event.target as HTMLInputElement).value });
           }
-          //this.validate(name);
+          this.validate(name);
         };
 
         // Use 'change' event for select elements, 'input' for others

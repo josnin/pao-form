@@ -48,6 +48,9 @@ A lightweight form builder library for both TypeScript and plain JavaScript, ins
     fb.control('Traveling'),
   ]);
 
+  // It is required to validate the user form group initially
+  userFormGroup.validateAll()
+
 ```
 
 ### Subscribe to Changes
